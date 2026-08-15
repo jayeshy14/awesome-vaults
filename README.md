@@ -1,10 +1,10 @@
 # Awesome Vaults [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 
-> A curated guide to onchain vaults, from your first ERC-4626 contract to production curator systems, async accounting, and the security work that keeps depositor funds safe.
+> A curated guide to onchain vaults, from your first ERC-4626 contract to production curator systems, async accounting, structured products, and the security work that keeps depositor funds safe.
 
-A vault is a smart contract that takes a deposit, issues shares that represent a claim on a growing pool of assets, and puts that capital to work. The pattern now sits under a large share of DeFi: yield aggregators, curated lending, liquid staking wrappers, structured products, and institutional asset management all run on it. There are `awesome` lists for Solidity, for Diamonds, and for DeFi in general, but there was no single map for vaults. This is that map.
+A vault is a smart contract that takes a deposit, issues shares that represent a claim on a growing pool of assets, and puts that capital to work. The pattern now sits under a large share of DeFi: yield aggregators, curated lending, liquid staking and restaking wrappers, structured products, and institutional asset management all run on it. There are `awesome` lists for Solidity, for Diamonds, and for DeFi in general, but there was no single map for vaults. This is that map.
 
-Every entry links to a primary source, an EIP page, an official doc, a protocol's own repository, or the author's own writing. Each has a one line description of what you learn and a level tag so you can read in order.
+Every entry links to a primary source, an EIP page, an official doc, a protocol's own repository, or the author's own writing. Each has a one line description of what you learn and a level tag so you can read in order. A few historical protocols are included where their design still teaches something builders reinvent today, and they are labeled as such.
 
 **Levels:** (beginner) first exposure to the idea, (intermediate) you can already read Solidity and want the mechanism, (advanced) protocol-grade architecture, accounting internals, and security.
 
@@ -17,12 +17,18 @@ Every entry links to a primary source, an EIP page, an official doc, a protocol'
 - [Testing and Formal Verification](#testing-and-formal-verification)
 - [Yield Aggregator Vaults](#yield-aggregator-vaults)
 - [Curated Lending Vaults](#curated-lending-vaults)
+- [Curators and Curation](#curators-and-curation)
 - [Institutional and Generalized Vault Frameworks](#institutional-and-generalized-vault-frameworks)
 - [Structured Products and Tranched Vaults](#structured-products-and-tranched-vaults)
+- [Options and Structured-Note Vaults](#options-and-structured-note-vaults)
+- [Restaking and LRT Vaults](#restaking-and-lrt-vaults)
+- [Credit and RWA Vaults](#credit-and-rwa-vaults)
+- [Stablecoin and Synthetic-Dollar Vaults](#stablecoin-and-synthetic-dollar-vaults)
+- [Liquidity Management Vaults](#liquidity-management-vaults)
 - [Asynchronous and Multi-Strategy Architecture](#asynchronous-and-multi-strategy-architecture)
 - [Deep-Dive Articles and Research](#deep-dive-articles-and-research)
 - [Videos, Talks, and Courses](#videos-talks-and-courses)
-- [Live Data, Dashboards, and Ecosystem](#live-data-dashboards-and-ecosystem)
+- [Live Data, Dashboards, and Risk](#live-data-dashboards-and-risk)
 
 ## Standards and EIPs
 
@@ -57,6 +63,7 @@ Battle-tested code to read, inherit, or fork. Reading these side by side is one 
 - [Solady ERC4626.sol](https://github.com/Vectorized/solady/blob/main/src/tokens/ERC4626.sol) - A gas-optimized ERC-4626 implementation that exposes virtual shares and a decimals offset through overridable functions. (advanced)
 - [snekmate ERC-4626 (Vyper)](https://github.com/pcaversaccio/snekmate) - Pcaversaccio's audited, security-focused Vyper library, including a modern gas-efficient ERC-4626 vault with unit, property-based, and invariant tests, the canonical Vyper counterpart to the Solidity implementations. (intermediate)
 - [yield-daddy](https://github.com/timeless-fi/yield-daddy) - ERC-4626 wrapper contracts and factories that adapt Aave V2 and V3, Compound, Euler, and Lido stETH positions into the vault interface. (intermediate)
+- [PoolTogether V5 PrizeVault](https://github.com/pooltogether/v5-vault) - A well-audited, spec-strict ERC-4626 wrapper that routes deposits into an underlying yield source and contributes the accrued yield to a shared prize pool instead of paying it out pro rata. (intermediate)
 - [ERC-7540 Reference Implementations](https://github.com/ERC4626-Alliance/ERC-7540-Reference) - Four minimal async vaults, controlled async deposit, controlled async redeem, fully async, and timelocked redeem, that show how the request lifecycle is coded over ERC-4626. (intermediate)
 
 ## Security: Attacks and Defenses
@@ -71,6 +78,7 @@ The failure modes that have drained real vaults, and the patterns that prevent t
 - [Solodit Checklist Explained: Donation Attacks](https://www.cyfrin.io/blog/solodit-checklist-explained-3-donation-attacks) - An auditor checklist entry from Cyfrin showing with code how direct token transfers manipulate balance-based accounting and which patterns prevent it. (intermediate)
 - [So You Want to Use a Price Oracle](https://samczsun.com/so-you-want-to-use-a-price-oracle/) - samczsun's landmark writeup on oracle manipulation, dissecting the bZx, Harvest, and Synthetix exploits and the defenses, the foundational reference for why reading a spot price mid-transaction is dangerous. (advanced)
 - [ResupplyFi Hack Analysis](https://ackee.xyz/blog/resupply-hack-analysis/) - Post-mortem from Ackee of the 2025 Resupply exploit, tracing how a donation into a nearly empty ERC-4626 vault drove the exchange rate to zero through floor division and bypassed the solvency check. (advanced)
+- [StakedUSDeV2 Breaks the ERC-4626 Standard](https://github.com/code-423n4/2023-10-ethena-findings/issues/562) - A Code4rena finding on Ethena's staking vault showing how a cooldown-gated withdraw path can make a live vault non-compliant with ERC-4626, a concrete example of standard-conformance risk. (advanced)
 - [ERC4626 Inflation Attack Mitigation (PR #3979)](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3979) - The pull request that added virtual shares to OpenZeppelin's ERC4626, with review discussion covering the math and trade-offs of the decimals offset. (advanced)
 
 ## Testing and Formal Verification
@@ -80,6 +88,9 @@ Prove your vault meets the spec rather than hoping it does.
 - [a16z erc4626-tests](https://github.com/a16z/erc4626-tests) - A Foundry property-test suite that checks any ERC-4626 vault for round-trip behavior, balance and allowance updates, non-reverting view functions, and preview accuracy, meant to be inherited by your own test contract. (advanced)
 - [crytic/properties ERC-4626 Suite](https://github.com/crytic/properties/blob/main/contracts/ERC4626/README.md) - Reusable Echidna and Medusa invariants from Trail of Bits grouped into accounting, rounding, and security property sets that a vault can fuzz against for conformance and inflation resistance. (advanced)
 - [Reusable Properties for Ethereum Contracts](https://blog.trailofbits.com/2023/02/27/reusable-properties-ethereum-contracts-echidna/) - The Trail of Bits writeup explaining the reasoning behind the reusable ERC-4626 and ERC-20 invariants and how to wire them into a fuzzing harness. (intermediate)
+- [How to Fuzz ERC-4626 Vaults](https://getrecon.xyz/blog/how-to-fuzz-erc4626-vaults) - A hands-on Recon guide to building an invariant-fuzzing harness for a synchronous vault, covering the properties to assert and the setup that catches accounting and rounding bugs. (intermediate)
+- [How to Fuzz ERC-7540 Async Vaults](https://getrecon.xyz/blog/how-to-fuzz-erc7540-async-vaults) - The async counterpart from Recon, showing how to model the request lifecycle and settlement so a fuzzer can reach the states where async vaults break. (advanced)
+- [The Recon Book](https://book.getrecon.xyz/) - A free handbook on invariant testing and fuzzing for Solidity, useful as the broader method behind the vault-specific fuzzing guides. (intermediate)
 - [Is My ERC-4626 Vault Token Up to the Standard?](https://runtimeverification.com/blog/is-my-erc-4626-vault-token-up-to-the-standard) - Runtime Verification compares the a16z property suite and the ERCx service and covers round-trip properties and functional correctness for both deployed and undeployed contracts, the formal-methods complement to fuzzing. (advanced)
 
 ## Yield Aggregator Vaults
@@ -95,6 +106,9 @@ Vaults that route deposits into strategies and compound the returns. The origina
 - [Beefy Vault Contract](https://docs.beefy.finance/developer-documentation/vault-contract) - Walks through the BeefyVaultV7 contract that mints mooToken shares and routes deposited tokens into a separate, upgradeable strategy contract to isolate strategy risk. (intermediate)
 - [Beefy Strategy Contract](https://docs.beefy.finance/developer-documentation/strategy-contract) - Explains the Beefy strategy contract and its harvest flow that claims farm rewards, swaps them to the underlying asset, and redeposits to auto-compound. (intermediate)
 - [beefyfinance/beefy-contracts](https://github.com/beefyfinance/beefy-contracts) - Public repository of Beefy vault and strategy contracts with the deployment and testing scripts used for community-submitted auto-compounding strategies. (advanced)
+- [Tokemak Autopilot](https://docs.tokemak.xyz/developer-docs/contracts-overview/autopool-eth-contracts-overview/autopilot-system-high-level-overview) - Documents how Tokemak Autopilot deploys an ERC-4626 Autopool across a fixed set of liquidity destinations and continuously rebalances deposits toward the best risk-adjusted return. (advanced)
+- [Summer.fi Lazy Summer Protocol Documentation](https://docs.summer.fi/lazy-summer-protocol/lazy-summer-protocol) - Documents the Fleet vaults that deploy deposits across yield-generating Arks with keeper-driven rebalancing inside FleetCommander constraints and externally set risk parameters. (advanced)
+- [OasisDEX/lazy-summer-protocol](https://github.com/OasisDEX/lazy-summer-protocol) - Solidity source for the Lazy Summer Protocol, including the FleetCommander, Ark strategy adapters, reward auctions, and the constrained rebalancer that keepers call. (advanced)
 - [Idle Best Yield Architecture](https://docs.idle.finance/developers/best-yield/architecture) - Covers how the Best Yield IdleToken vault allocates a single asset across lending protocols using off-chain-computed allocations that trigger on-chain rebalances. (intermediate)
 - [Idle Yield Tranches Architecture](https://docs.idle.finance/developers/yield-tranches) - Describes the IdleCDO contract that pools deposits, mints senior AA and junior BB tranche tokens, and routes funds through a strategy proxy to a downstream yield source. (advanced)
 - [Sommelier Protocol V2 Contract Architecture](https://sommelier-finance.gitbook.io/sommelier-documentation/smart-contracts/protocol-v2-contract-architecture) - Explains the Cellar V2 system of ERC-4626 vaults together with the Registry and PriceRouter contracts that price multi-token positions and constrain permitted adaptors. (intermediate)
@@ -118,6 +132,21 @@ The curator model, where a permissioned role allocates pooled deposits across is
 - [Introducing Euler Earn](https://euler.finance/blog/euler-earn) - Introduces an ERC-4626 meta-vault that lets a curator allocate one deposited asset across selected Euler markets or other approved ERC-4626 vaults. (intermediate)
 - [euler-xyz/euler-earn](https://github.com/euler-xyz/euler-earn) - Source for Euler Earn, a MetaMorpho-v1.1 fork, showing how the supply queue, withdraw queue, and per-strategy caps adapt to allocate over generic ERC-4626 strategy vaults. (advanced)
 - [Gearbox: One Pool, Many Markets](https://docs.gearbox.finance/core/one-pool-many-markets) - Documents the model where a single passive ERC-4626 liquidity pool funds multiple isolated credit markets, each capped by its own debt ceiling. (intermediate)
+- [Silo Finance V2](https://github.com/silo-finance/silo-contracts-v2) - Source for a lending protocol that builds isolated markets as paired ERC-4626 vaults, isolating each collateral asset's risk while a bridge asset connects markets for shared liquidity. (advanced)
+- [Sturdy V2 Documentation](https://docs.sturdy.finance/) - Documents a two-tier design where siloed lending pairs isolate collateral risk and a Yearn V3 aggregator vault allocates a single deposited asset across whitelisted silos. (advanced)
+
+## Curators and Curation
+
+Vaults are only as good as the people allocating them. This section covers how professional curators reason about risk, and the writeups that dissect the model's incentives and failures.
+
+- [Gauntlet VaultBook](https://vaultbook.gauntlet.xyz/) - A live methodology hub from one of the largest curators, explaining its curation approach, risk factors, and the per-vault optimization and risk parameters it sets. (intermediate)
+- [Steakhouse Financial: Risk Management Framework](https://www.steakhouse.financial/docs) - Documents Steakhouse's multilayered risk rating framework that grades collateral across asset, platform, and market layers on a letter scale. (advanced)
+- [Introducing the Re7 Risk Index](https://re7research.substack.com/p/introducing-re7-risk-index) - A curator's own methodology for scoring protocols across smart-contract, governance, economic, and third-party risk to size vault positions. (intermediate)
+- [Curve Market Health Scores Methodology](https://llamarisk.substack.com/p/curve-market-health-scores-methodology) - LlamaRisk explains how it computes quantitative market health scores for lending markets, including the inputs and thresholds that flag conditions needing action. (advanced)
+- [Gauging Slashing Risks of Symbiotic Networks](https://www.mevcapital.com/main-blog-post/gauging-slashing-risks-of-symbiotic-networks) - MEV Capital details a weighted, multi-category scoring method for evaluating the slashing risk a restaking vault takes on when it backs a network. (advanced)
+- [The Physics of On-Chain Lending (II)](https://dirtroads.substack.com/p/69-the-physics-of-on-chain-lending) - A deep analyst treatment of the curator role model, the fee economics, and the game theory of vault runs. (advanced)
+- [DeFi's Black Box: How Risk and Yield Are Repackaged](https://chaoslabs.xyz/posts/defi-s-black-box-how-risk-and-yield-are-repackaged) - A risk-analyst critique of curator incentive misalignment and the structural weaknesses of the curator model. (intermediate)
+- [Collapse of the DeFi Jenga: The Stream Finance Breakdown](https://reports.tiger-research.com/p/collapse-of-the-defi-jenga-the-stream-eng) - An analyst post-mortem of a real curation failure and how the losses propagated through curator-managed vaults. (intermediate)
 
 ## Institutional and Generalized Vault Frameworks
 
@@ -128,22 +157,31 @@ Generalized vault stacks built for professional asset managers, where a strategi
 - [How DeFi Vaults Work: The Infrastructure Abstracting Onchain Yield](https://www.plasma.org/learn/how-defi-vaults-work-the-infrastructure-abstracting-onchain-yield) - An introductory explanation of the BoringVault module split and merkle-tree whitelisting for readers new to how institutional vaults restrict strategist actions. (beginner)
 - [Aera BaseVault and Core Interactions](https://docs.aera.finance/basevault-and-core-interactions) - Aera V3 documentation on the BaseVault contract, covering guardian-submitted operations verified by merkle proofs, mandatory whitelisting, operation chaining, and configurable pre and post-operation hooks. (advanced)
 - [aera-finance/aera-contracts-public](https://github.com/aera-finance/aera-contracts-public) - Versioned contract snapshots of Aera's SingleDepositorVault and MultiDepositorVault implementations and their guardian-based execution layer. (advanced)
-- [What Features Do Earn Vaults Need? A Technical Deep Dive for Aera](https://www.gauntlet.xyz/resources/what-features-do-earn-vaults-need-a-technical-deep-dive-for-aera) - An overview from Gauntlet of the constraint enforcement, strategy composability, cross-chain accounting, and guardian execution capabilities an institutional earn vault has to support. (intermediate)
 - [Lagoon Vault Architecture Overview](https://docs.lagoon.finance/vault/architecture-overview) - Documentation on Lagoon's ERC-7540 request-and-settle flow, where a valuation provider posts NAV and a curator settles pending deposits and redemptions at a defined valuation point. (intermediate)
 - [superform-xyz/v2-periphery](https://github.com/superform-xyz/v2-periphery) - Source for Superform v2 SuperVaults, an ERC-7540 vault with synchronous deposits and asynchronous redemptions that executes merkle-verified hook bundles through its strategy, aggregator, and escrow contracts. (advanced)
-- [The DeFi Vaultization Era: Veda, Aera, IPOR, and Lagoon](https://medium.com/exa-group/the-defi-vaultization-era-veda-aera-ipor-and-lagoon-finance-73988c17e161) - A side-by-side comparison of four vault frameworks across their custody models, strategy-execution mechanisms, and gas costs. (intermediate)
+- [Fluid (Instadapp) contracts](https://github.com/instadapp/fluid-contracts-public) - Public source for Fluid, whose liquidity layer underpins smart lending and smart vaults that share a single collateral and debt accounting system across products. (advanced)
+- [YelayLiteVault](https://github.com/YieldLayer/yelay-lite) - Source for a diamond-style ERC-1155 single-asset vault that routes deposits through configurable strategy queues managed by role-based operators. (advanced)
+- [Index Coop index-protocol (Set Protocol V2)](https://github.com/IndexCoop/index-protocol) - A modular framework for tokenized, manager-curated asset baskets where a manager enables modules for issuance, trading, and strategy, maintained as a Set Protocol V2 fork. (advanced)
 - [Enzyme (Onyx) Architecture Overview](https://docs.enzyme.finance/onyx-protocol/architecture/architecture-overview) - Architecture docs for the oldest onchain asset-management vault protocol, whose modular shares-plus-components design deliberately extends beyond ERC-4626 for custom fees, multi-asset strategies, and granular permissions. (intermediate)
+- [VaultCraft V2 Safe Smart Vaults](https://docs.vaultcraft.io/products/v2-safe-smart-vaults) - Documents a vault framework built as Safe modules, letting a manager run strategies from a Safe multisig while depositors hold tokenized shares. (intermediate)
+- [Concrete Vault Documentation](https://docs.concrete.xyz/Overview/welcome/) - Introduces a vault framework with bounded off-chain value updates and modular strategy routing for building managed earn products. (intermediate)
+- [Upshift Documentation](https://docs.upshift.finance/) - Documentation for an institutional structured-yield vault platform that packages curated strategies into permissioned deposit products. (intermediate)
 
 ## Structured Products and Tranched Vaults
 
 Vaults that split risk and return into distinct layers: principal and yield, or senior and junior tranches.
 
+- [Strata Protocol Overview](https://docs.strata.markets/technical-documentation/protocol-overview) - Documents how Strata splits yield from a base asset into ERC-4626 Senior and Junior tranches, with a CDO orchestrator routing user actions and a gain-split that targets a benchmark Senior APR while Junior TVL absorbs first losses. (intermediate)
+- [Strata-Markets/contracts](https://github.com/Strata-Markets/contracts) - Solidity source for Strata's tranching vaults, where the CDO orchestrator forwards deposits and withdrawals to two ERC-4626 meta vaults for the Junior and Senior tranches alongside separate Accounting, Strategy, and APR Feed contracts. (advanced)
+- [Royco Dawn Documentation](https://docs.royco.org/) - Docs for Royco's tranching product, which splits a yield source into Senior, Junior, and Senior Liquidity Provider tranches so depositors choose a risk and liquidity profile. (intermediate)
+- [roycoprotocol/royco-dawn](https://github.com/roycoprotocol/royco-dawn) - Source for Royco Dawn, splitting a yield source into junior and senior tranches with a Kernel and Accountant enforcing coverage ratios and a Yield Distribution Model routing senior yield to junior. (advanced)
 - [Pendle Documentation: Introduction](https://docs.pendle.finance/pendle-v2/Introduction) - Explains how Pendle wraps yield-bearing tokens into SY and splits them into Principal Tokens and Yield Tokens so fixed principal and variable yield can be traded separately. (beginner)
 - [Pendle AMM Mechanics](https://docs.pendle.finance/pendle-v2/ProtocolMechanics/LiquidityEngines/AMM) - Describes how the V2 AMM concentrates liquidity in a yield range that tightens toward maturity and serves both PT and YT trades from one PT/SY pool through flash swaps. (intermediate)
 - [Pendle V2 AMM Whitepaper](https://github.com/pendle-finance/pendle-v2-resources/blob/main/whitepapers/V2_AMM.pdf) - Derives the time-dependent AMM invariant, Principal Token pricing, and fee model that Pendle V2 uses to price and trade yield. (advanced)
 - [Yield Tokenization Protocols, How They Are Made: Pendle](https://mixbytes.io/blog/yield-tokenization-protocols-how-they-re-made-pendle) - An auditor's walkthrough from MixBytes of Pendle's SY standard, PT and YT minting, market and router contracts, AMM curve, and the oracle and ratchet protections against manipulation. (advanced)
-- [BarnBridge Litepaper](https://github.com/BarnBridge/BarnBridge-Whitepaper/blob/master/Litepaper.md) - Outlines SMART Yield fixed-rate tranching of variable lending yield and SMART Alpha volatility tranching, both structured as senior and junior risk layers. (intermediate)
-- [BarnBridge Docs: Junior Tranches](https://github.com/BarnBridge/barnbridge-docs/blob/master/sy-specs/junior-tranches.md) - Specifies junior-token accounting in SMART Yield, including how juniors absorb yield shortfalls below the senior guarantee and exit through maturing jBOND NFTs. (advanced)
+- [Tranchess Whitepaper](https://docs.tranchess.com/whitepaper) - Documents how a single asset-tracking fund (QUEEN) splits into a low-volatility yield tranche (BISHOP) and a leveraged tranche (ROOK) that lend to and borrow from each other, with automatic rebalancing when leverage crosses thresholds. (intermediate)
+- [tranchess/contract-core](https://github.com/tranchess/contract-core) - Solidity source for the Tranchess fund, implementing primary-market creation of QUEEN shares and their split into BISHOP and ROOK tranche tokens. (advanced)
+- [Buttonwood Tranche](https://github.com/buttonwood-protocol/tranche) - Contracts that deposit a collateral token into a bond and mint a series of tranche tokens redeemed in a maturity waterfall, where senior tranches are repaid first and junior tranches absorb losses and capture upside. (advanced)
 - [Notional V3: What Is fCash](https://docs.notional.finance/notional-v3/fcash/what-is-fcash) - Documents fCash, a zero-coupon-bond token defined by currency and maturity whose positive and negative balances represent fixed-rate lending and borrowing claims. (intermediate)
 - [notional-finance/contracts-v3](https://github.com/notional-finance/contracts-v3) - Source for Notional V3, showing how fCash markets, fixed-to-variable settlement, and leveraged vault strategies are implemented. (advanced)
 - [Napier: PT and YT, Tokenized Yield](https://docs.napier.finance/learn/protocols/pt-and-yt-tokenized-yield) - Introduces stripping an ERC-5115 target asset into a Principal Token that redeems 1:1 at maturity and a Yield Token that captures accrued yield, deployed in permissionless isolated markets. (beginner)
@@ -152,6 +190,68 @@ Vaults that split risk and return into distinct layers: principal and yield, or 
 - [Sense Finance: Core Concepts](https://docs.sense.finance/docs/core-concepts/) - Explains the Divider and Adapter design that strips a target asset into fixed-term Principal and Yield Tokens traded on the YieldSpace-based Sense Space AMM. (intermediate)
 - [IPOR Protocol: Interest Rate Derivative](https://docs.ipor.io/ipor-derivatives/interest-rate-derivatives/interest-rate-derivative) - Documents IPOR's on-chain interest-rate swap in which payer and receiver exchange fixed and floating cash-flow streams against a liquidity-pool counterparty. (intermediate)
 - [Term Finance Documentation](https://docs.term.finance/) - Describes a non-custodial fixed-rate lending protocol modeled on tri-party repo where recurring sealed-bid auctions clear borrowers and lenders at a single market rate. (intermediate)
+- [BarnBridge Litepaper](https://github.com/BarnBridge/BarnBridge-Whitepaper/blob/master/Litepaper.md) - Outlines SMART Yield fixed-rate tranching of variable lending yield and SMART Alpha volatility tranching, both structured as senior and junior risk layers. (intermediate)
+- [BarnBridge Docs: Junior Tranches](https://github.com/BarnBridge/barnbridge-docs/blob/master/sy-specs/junior-tranches.md) - Specifies junior-token accounting in SMART Yield, including how juniors absorb yield shortfalls below the senior guarantee and exit through maturing jBOND NFTs. (advanced)
+- [SOFA.org Protocols](https://docs.sofa.org/technical-design/vault-classification.html) - Documents an onchain structured-products system that locks deposits in ERC-1155 vaults minting position tokens for capital-protected and leveraged payoffs settled at a fixed strike and expiry. (intermediate)
+- [Alchemix v2 Transmuter](https://docs.alchemix.fi/alchemix-ecosystem/transmuter) - Explains the self-repaying-loan design, where collateral is deposited into yield strategies and a synthetic debt token is issued against it while the generated yield routes through a transmuter to repay the loan over time. (intermediate)
+- [Saffron Finance (saffron-finance/saffron)](https://github.com/saffron-finance/saffron) - A historical but instructive monorepo whose senior and junior tranche pools route a fixed lower yield to senior providers and a variable residual to junior providers layered over Compound lending. (advanced)
+- [Element Finance (delvtech/elf-contracts)](https://github.com/delvtech/elf-contracts) - A historical principal-and-yield-token design that splits a yield-bearing position into a principal token redeemable 1:1 at maturity and a separate yield token, a clean study of the zero-coupon split that predates much of the current PT/YT ecosystem. (advanced)
+- [88mph (88mphapp/88mph-contracts)](https://github.com/88mphapp/88mph-contracts) - A historical fixed-rate design where the DInterest contract pools variable-yield deposits and pays each depositor a locked fixed rate, funded by selling the corresponding floating-rate bond to a counterparty. (advanced)
+- [Yield Protocol v2 (yieldprotocol/vault-v2)](https://github.com/yieldprotocol/vault-v2) - A historical but rigorous fyToken design, ERC-20 zero-coupon tokens redeemable 1:1 after maturity that trade at a discount to give collateralized fixed-rate borrowing and lending. (advanced)
+
+## Options and Structured-Note Vaults
+
+Vaults that sell options or shape a payoff to generate premium, hedge, or underwrite risk.
+
+- [Building Decentralized Option Vaults](https://www.paradigm.co/blog/decentralized-option-vaults-part-1) - A vendor-neutral engineering walkthrough from Paradigm of decentralized option vault design, covering covered-call and protective-put strategies and the auction and settlement flow that turns deposits into option premium. (intermediate)
+- [Ribbon Finance: Theta Vault Architecture](https://docs.ribbon.finance/theta-vault/ribbon-v2) - The canonical description of the DeFi options vault pattern most later option-selling vaults copied, where a vault mints short options against collateral each week, auctions them for premium, and rolls at expiry. (intermediate)
+- [ribbon-finance/ribbon-v2](https://github.com/ribbon-finance/ribbon-v2) - A historical but production-grade reference for how a weekly-roll option-selling vault is implemented, covering vault accounting, auction settlement, and Opyn otoken minting. (advanced)
+- [Opyn Squeeth Monorepo](https://github.com/opynfinance/squeeth-monorepo) - Contracts for the Crab Strategy vault, a rare onchain example of an automated short-volatility vault that pairs long ETH collateral with short Squeeth power-perpetual debt and rebalances to stay delta-neutral. (advanced)
+- [Squeeth Primer](https://medium.com/opyn/squeeth-primer-a-guide-to-understanding-opyns-implementation-of-squeeth-a0f5e8b95684) - Explains the Squeeth power perpetual and how the Crab vault earns funding by selling volatility while staying delta-neutral to ETH, the conceptual bridge to the contracts. (intermediate)
+- [Cega Documentation](https://docs.cega.fi/) - Documents exotic structured notes built as EVM vaults, including fixed coupon notes that sell out-of-the-money puts for a fixed coupon while a knock-in barrier governs principal loss on large drawdowns. (intermediate)
+- [Thetanuts: Basic Vaults](https://docs.thetanuts.finance/legacy-v3/basic-vaults) - Describes Basic Vaults that sell out-of-the-money European cash-settled options to market makers and tokenize the resulting call and put positions into transferable LP tokens. (intermediate)
+- [Y2K Finance: Earthquake](https://github.com/Y2K-Finance/Earthquake) - Source for a historical two-sided depeg-insurance vault built on an ERC-4626 variant with ERC-1155 epoch receipts, where a risk side underwrites stablecoin depeg coverage and a hedge side buys it, with collateral moving to the winning side at settlement. (advanced)
+
+## Restaking and LRT Vaults
+
+Vaults built for restaking and liquid restaking, where deposits back external networks and take on slashing risk.
+
+- [Symbiotic Vault (Core Concepts)](https://docs.symbiotic.fi/learn/core-concepts/vault) - Documents how a Symbiotic vault holds and delegates restaked collateral to networks, and how deposit, withdraw, and slashing accounting work across epochs. (intermediate)
+- [symbioticfi/core](https://github.com/symbioticfi/core) - Source for Symbiotic's core restaking contracts, including the vault, delegator, and slasher modules that compose into a restaking market. (advanced)
+- [Mellow Vault Architecture](https://docs.mellow.finance/core-vaults/architecture/vaults/vault) - Explains Mellow's modular LRT vault design, how a vault composes deposit, strategy, and validator-management modules to build a liquid restaking token. (intermediate)
+- [mellow-finance/flexible-vaults](https://github.com/mellow-finance/flexible-vaults) - Source for Mellow's flexible vault framework, a modular system for assembling restaking and yield vaults from swappable components. (advanced)
+- [Mellow Flexible Vaults: Architecture, Workflows, and Security Model](https://crypto.training/blog/2026-01-05-mellow-architecture-and-workflows/) - A detailed third-party walkthrough of the Flexible Vaults architecture, the deposit and withdrawal workflows, and the security model. (advanced)
+- [Byzantine-Finance/byzantine-contracts](https://github.com/Byzantine-Finance/byzantine-contracts) - Source for a restaking aggregation layer that deploys strategy vaults routing deposits across EigenLayer, Symbiotic, and native staking. (advanced)
+
+## Credit and RWA Vaults
+
+Vaults that fund undercollateralized credit or tokenized real-world assets, usually with a senior and junior structure.
+
+- [Maple Smart Contract Architecture](https://docs.maple.finance/technical-resources/protocol-overview/smart-contract-architecture) - Documents how Maple structures lending pools, pool delegates, loan managers, and withdrawal queues for institutional undercollateralized lending. (intermediate)
+- [maple-labs/pool-v2](https://github.com/maple-labs/pool-v2) - Source for Maple's V2 pools, showing the ERC-4626 pool, pool manager, loan manager, and withdrawal-manager contracts that run a managed credit book. (advanced)
+- [Huma Tranche Deposit Mechanics](https://docs.huma.finance/products/huma-institutional/tranches/deposit) - Explains how Huma splits a receivables-financing pool into a senior tranche with capped fixed yield and a junior tranche that takes first loss for the residual. (intermediate)
+- [00labs/huma-contracts-v2](https://github.com/00labs/huma-contracts-v2) - Source for Huma Protocol V2, implementing tranched pools, credit lines, and the receivable-backed lending flow. (advanced)
+- [OpenTrade Blockchain Protocol](https://docs.opentrade.io/developers/blockchain-protocol) - Documents a vault-based protocol for tokenized fixed-income and treasury products, covering the deposit, settlement, and redemption flow for institutional RWA yield. (intermediate)
+- [Goldfinch Protocol](https://dev.goldfinch.finance/docs/reference/how-the-protocol-works) - Structures each borrower pool into a junior first-loss tranche funded by backers and a senior second-loss tranche funded by a pooled senior vault, applying repayments to the senior tranche first. (intermediate)
+- [MetaStreet v2](https://github.com/metastreet-labs/metastreet-contracts-v2) - Pools lender capital into per-collection NFT lending vaults where depositors set their own price ticks, composing those ticks into senior and junior tranche exposure without an external oracle. (advanced)
+- [Tinlake (Centrifuge legacy)](https://github.com/centrifuge/tinlake) - Centrifuge's historical V1 securitization contracts that pool NFT-collateralized real-world assets and issue a senior DROP tranche protected against defaults and a junior TIN tranche that takes first loss for higher yield. (advanced)
+
+## Stablecoin and Synthetic-Dollar Vaults
+
+Yield-bearing stablecoins and synthetic dollars implemented as vaults.
+
+- [Sky sUSDS (SUsds.sol)](https://github.com/sky-ecosystem/sdai/blob/susds/src/SUsds.sol) - Source for the sUSDS savings token, an ERC-4626 vault that accrues the Sky Savings Rate to USDS depositors through an internal rate-per-second accumulator. (advanced)
+- [Ethena StakedUSDe.sol](https://github.com/ethena-labs/bbp-public-assets/blob/main/contracts/contracts/StakedUSDe.sol) - Source for sUSDe, an ERC-4626 staking vault that distributes protocol yield to USDe stakers with a vesting mechanism and a cooldown-gated withdrawal path. (advanced)
+- [Origin ARM (Automated Redemption Manager)](https://github.com/OriginProtocol/arm-oeth) - Source for Origin's ARM, a vault that provides instant redemption liquidity for a liquid staking token by holding a buffer and arbitraging the redemption queue. (advanced)
+- [Resolv: Staking stUSR and wstUSR](https://docs.resolv.xyz/litepaper/using-resolv/usr/stake) - Documents how the USR synthetic dollar is staked into the yield-bearing stUSR and its wrapped ERC-4626 form wstUSR, and how insurance-pool yield is distributed. (intermediate)
+
+## Liquidity Management Vaults
+
+Vaults that manage concentrated liquidity positions and rebalance their price ranges.
+
+- [Gamma Strategies Hypervisor](https://github.com/GammaStrategies/hypervisor) - A widely forked fungible-share vault that manages a concentrated Uniswap V3 liquidity position and rebalances its price ranges through a supervisor contract. (intermediate)
+- [Arrakis V2 Core](https://github.com/ArrakisFinance/v2-core) - Source for Arrakis V2 vaults, which manage concentrated liquidity across multiple price ranges and expose the position as a fungible token with programmable rebalancing. (advanced)
+- [Steer Protocol Documentation](https://docs.steer.finance/) - Documents a framework for automated concentrated-liquidity management vaults where off-chain strategy executors rebalance ranges within on-chain guardrails. (intermediate)
 
 ## Asynchronous and Multi-Strategy Architecture
 
@@ -173,6 +273,7 @@ Long-form analysis of vault design and the economy that has grown around it.
 - [DeFi Curators in 2025: Navigating Chaos, Building Resilience](https://chorus.one/reports-research/defi-curators-in-2025-navigating-chaos-building-resilience) - Traces curator TVL growth and analyzes how the 2025 Balancer exploit and Stream Finance collapse propagated through curator-managed vaults. (intermediate)
 - [The Vault Economy](https://sentora.com/research/reports/the-vault-economy) - Surveys vault types from single-protocol earn vaults to multi-strategy cross-chain deployments and presents a risk taxonomy that treats collateral selection as the central curation decision. (intermediate)
 - [Institutionalizing Risk Curation in Decentralized Credit](https://arxiv.org/html/2512.11976v1) - An academic study modeling DeFi lending as a two-layer system of ERC-4626 vaults and third-party curators, measuring curator concentration and correlated tail risk across Aave, Morpho, and Euler, and proposing standardized onchain disclosures. (advanced)
+- [YieldSpace: An Automated Liquidity Provider for Fixed Yield Tokens](https://yield.is/YieldSpace.pdf) - The paper deriving the YieldSpace constant-power invariant, an AMM curve whose marginal price tracks a constant interest rate to maturity so a pool can quote fixed yields on discount tokens. (advanced)
 
 ## Videos, Talks, and Courses
 
@@ -186,9 +287,9 @@ Watch someone build and reason through a vault.
 - [Securing ERC4626 Implementations](https://www.youtube.com/watch?v=5KVD7EX6HWQ) - Reviews common security pitfalls including the first-depositor inflation attack, rounding direction, and donation manipulation. (advanced)
 - [Advanced Smart Contract Development With Foundry](https://updraft.cyfrin.io/courses/advanced-foundry) - A free multi-project Cyfrin course covering DeFi protocol, stablecoin, and cross-chain rebase token development with vault accounting and testing practice. (intermediate)
 
-## Live Data, Dashboards, and Ecosystem
+## Live Data, Dashboards, and Risk
 
-Study real vaults in production. Tie the numbers you see back to the accounting you have read.
+Study real vaults in production, and the tools that rate their risk. Tie the numbers you see back to the accounting you have read.
 
 - [DeFiLlama Yields](https://defillama.com/yields) - Ranks live yield-bearing pools and vaults across chains by TVL and APY, with filters for ERC-4626 vaults and a view of each pool's underlying strategy. (beginner)
 - [vaults.fyi](https://app.vaults.fyi) - Aggregates ERC-4626 and curator-managed vaults across networks into one table of TVL, seven-day yield, and holder counts for side-by-side comparison. (beginner)
@@ -197,8 +298,10 @@ Study real vaults in production. Tie the numbers you see back to the accounting 
 - [Morpho Data Dashboards](https://docs.morpho.org/developers/ecosystem/data-dashboards) - Morpho's documentation index of its official Dune dashboards, including vault performance and vault curators, pointing to the canonical MetaMorpho analytics. (intermediate)
 - [Morpho Vaults and Curators Analysis (Dune)](https://dune.com/morpho/vaults-curators-analysis) - An official Dune dashboard breaking MetaMorpho vaults and their curators down by TVL, allocation, reallocation activity, and yield on Ethereum and Base. (intermediate)
 - [Veda Dashboard (Dune)](https://dune.com/veda/veda) - A Dune dashboard tracking TVL and capital flows across Veda's BoringVault deployments. (intermediate)
-- [Dune Curated Vaults Data Catalog](https://docs.dune.com/data-catalog/curated/vaults/overview) - Documents the decoded on-chain event tables Dune exposes for Morpho, Euler v2, Aave v3, Fluid, and other vault protocols, the raw tables for writing custom vault queries. (advanced)
+- [Xerberus Documentation](https://documentation.xerberus.io/) - Documents an onchain risk-rating API that exposes per-vault and per-asset scores decomposing a vault into subscores across smart-contract, oracle, custody, and economic risk. (intermediate)
+- [DD.xyz](https://www.dd.xyz/) - A vault data and risk platform from Webacy that assigns live risk scores and listing verdicts to ERC-4626 vaults across Morpho, Aave, Compound, and Yearn, alongside stablecoin peg and RWA monitoring. (intermediate)
 - [DIA DeFi Vaults and Lending Map](https://www.diadata.org/map/defi-vaults-lending/) - Tracks thousands of vaults across many chains with per-vault audits, TVL, oracle and timelock configuration, and curator track records. (intermediate)
+- [Dune Curated Vaults Data Catalog](https://docs.dune.com/data-catalog/curated/vaults/overview) - Documents the decoded on-chain event tables Dune exposes for Morpho, Euler v2, Aave v3, Fluid, and other vault protocols, the raw tables for writing custom vault queries. (advanced)
 - [List All ERC-4626 Vaults On-Chain](https://web3-ethereum-defi.readthedocs.io/tutorials/erc-4626-vault-list.html) - A tutorial that programmatically enumerates every ERC-4626 vault across chains from on-chain data, showing how to detect and read deployed vaults directly instead of through a front-end. (advanced)
 
 ## Contributing
