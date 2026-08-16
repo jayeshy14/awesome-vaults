@@ -20,6 +20,7 @@ Every entry links to a primary source, an EIP page, an official doc, a protocol'
 - [Curators and Curation](#curators-and-curation)
 - [Institutional and Generalized Vault Frameworks](#institutional-and-generalized-vault-frameworks)
 - [Structured Products and Tranched Vaults](#structured-products-and-tranched-vaults)
+- [Structured Credit Foundations (TradFi)](#structured-credit-foundations-tradfi)
 - [Options and Structured-Note Vaults](#options-and-structured-note-vaults)
 - [Restaking and LRT Vaults](#restaking-and-lrt-vaults)
 - [Credit and RWA Vaults](#credit-and-rwa-vaults)
@@ -80,6 +81,7 @@ The failure modes that have drained real vaults, and the patterns that prevent t
 - [ResupplyFi Hack Analysis](https://ackee.xyz/blog/resupply-hack-analysis/) - Post-mortem from Ackee of the 2025 Resupply exploit, tracing how a donation into a nearly empty ERC-4626 vault drove the exchange rate to zero through floor division and bypassed the solvency check. (advanced)
 - [StakedUSDeV2 Breaks the ERC-4626 Standard](https://github.com/code-423n4/2023-10-ethena-findings/issues/562) - A Code4rena finding on Ethena's staking vault showing how a cooldown-gated withdraw path can make a live vault non-compliant with ERC-4626, a concrete example of standard-conformance risk. (advanced)
 - [ERC4626 Inflation Attack Mitigation (PR #3979)](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3979) - The pull request that added virtual shares to OpenZeppelin's ERC4626, with review discussion covering the math and trade-offs of the decimals offset. (advanced)
+- [Auditing Vault-Based Protocols in DeFi](https://cantina.xyz/blog/auditing-vault-based-protocols-in-defi) - A security firm's field guide to reviewing vault protocols, covering share-price manipulation, accounting drift, access control on strategy routing, and the invariants worth testing. (advanced)
 
 ## Testing and Formal Verification
 
@@ -168,6 +170,7 @@ Generalized vault stacks built for professional asset managers, where a strategi
 - [VaultCraft V2 Safe Smart Vaults](https://docs.vaultcraft.io/products/v2-safe-smart-vaults) - Documents a vault framework built as Safe modules, letting a manager run strategies from a Safe multisig while depositors hold tokenized shares. (intermediate)
 - [Concrete Vault Documentation](https://docs.concrete.xyz/Overview/welcome/) - Introduces a vault framework with bounded off-chain value updates and modular strategy routing for building managed earn products. (intermediate)
 - [Upshift Documentation](https://docs.upshift.finance/) - Documentation for an institutional structured-yield vault platform that packages curated strategies into permissioned deposit products. (intermediate)
+- [Matador by Steer](https://matador.steer.finance) - A policy-enforcement layer for smart accounts that compiles readable rules into onchain bytecode, letting a vault bound a manager to specific callers, targets, functions, values, and state-dependent conditions instead of a blanket key. (advanced)
 
 ## Structured Products and Tranched Vaults
 
@@ -201,6 +204,16 @@ Vaults that split risk and return into distinct layers: principal and yield, or 
 - [88mph (88mphapp/88mph-contracts)](https://github.com/88mphapp/88mph-contracts) - A historical fixed-rate design where the DInterest contract pools variable-yield deposits and pays each depositor a locked fixed rate, funded by selling the corresponding floating-rate bond to a counterparty. (advanced)
 - [Yield Protocol v2 (yieldprotocol/vault-v2)](https://github.com/yieldprotocol/vault-v2) - A historical but rigorous fyToken design, ERC-20 zero-coupon tokens redeemable 1:1 after maturity that trade at a discount to give collateralized fixed-rate borrowing and lending. (advanced)
 
+## Structured Credit Foundations (TradFi)
+
+The traditional structured-credit machinery that onchain tranching is slowly rebuilding: waterfalls, coverage tests, and the CLO track record that came from them.
+
+- [Hastructure](https://github.com/yellowbean/Hastructure) - An open-source structured-finance cashflow engine that models waterfalls, coverage triggers, and interest and principal priorities as data, a rare look at how a mature system structures the logic onchain tranching reimplements. (advanced)
+- [absbox](https://github.com/yellowbean/absbox) - A Python analytics library over the Hastructure engine for cashflow projection and structured-credit analysis, usable as an offchain reference or differential-test oracle for an onchain waterfall. (advanced)
+- [CLO Coverage Tests](https://collateralizedloanobligations.com/mechanics/coverage-tests) - Explains the overcollateralization and interest-coverage tests, their trigger levels, the impaired-asset haircuts, and the cash-diversion cure that reroutes junior cash to pay down senior notes, the covenant machinery onchain vaults mostly lack. (intermediate)
+- [Understanding Collateralized Loan Obligations](https://www.guggenheiminvestments.com/perspectives/portfolio-strategy/understanding-collateralized-loan-obligations-clo) - A clear primer on CLO structure, the tranche stack from AAA down to equity, subordination, and the manager's role, useful context for anyone bringing the model onchain. (beginner)
+- [CLO Equity Performance (Cordell, Roberts, Schwert)](https://w4.stern.nyu.edu/finance/docs/pdfs/Seminars/CLO-Performance.pdf) - An empirical study of realized CLO equity returns across hundreds of deals, the clearest data on what the first-loss tranche is actually paid to hold the risk. (advanced)
+
 ## Options and Structured-Note Vaults
 
 Vaults that sell options or shape a payoff to generate premium, hedge, or underwrite risk.
@@ -213,6 +226,7 @@ Vaults that sell options or shape a payoff to generate premium, hedge, or underw
 - [Cega Documentation](https://docs.cega.fi/) - Documents exotic structured notes built as EVM vaults, including fixed coupon notes that sell out-of-the-money puts for a fixed coupon while a knock-in barrier governs principal loss on large drawdowns. (intermediate)
 - [Thetanuts: Basic Vaults](https://docs.thetanuts.finance/legacy-v3/basic-vaults) - Describes Basic Vaults that sell out-of-the-money European cash-settled options to market makers and tokenize the resulting call and put positions into transferable LP tokens. (intermediate)
 - [Y2K Finance: Earthquake](https://github.com/Y2K-Finance/Earthquake) - Source for a historical two-sided depeg-insurance vault built on an ERC-4626 variant with ERC-1155 epoch receipts, where a risk side underwrites stablecoin depeg coverage and a hedge side buys it, with collateral moving to the winning side at settlement. (advanced)
+- [An Explanation of DeFi Options Vaults (DOVs)](https://qcpcapital.medium.com/an-explanation-of-defi-options-vaults-dovs-22d7f0d0c09f) - QCP's primer on the DeFi option vault model, how vaults systematically sell out-of-the-money options for premium and the risk and return profile depositors take on. (beginner)
 
 ## Restaking and LRT Vaults
 
@@ -276,6 +290,11 @@ Long-form analysis of vault design and the economy that has grown around it.
 - [The Vault Economy](https://sentora.com/research/reports/the-vault-economy) - Surveys vault types from single-protocol earn vaults to multi-strategy cross-chain deployments and presents a risk taxonomy that treats collateral selection as the central curation decision. (intermediate)
 - [Institutionalizing Risk Curation in Decentralized Credit](https://arxiv.org/html/2512.11976v1) - An academic study modeling DeFi lending as a two-layer system of ERC-4626 vaults and third-party curators, measuring curator concentration and correlated tail risk across Aave, Morpho, and Euler, and proposing standardized onchain disclosures. (advanced)
 - [YieldSpace: An Automated Liquidity Provider for Fixed Yield Tokens](https://yield.is/YieldSpace.pdf) - The paper deriving the YieldSpace constant-power invariant, an AMM curve whose marginal price tracks a constant interest rate to maturity so a pool can quote fixed yields on discount tokens. (advanced)
+- [The Road to the Complete Vault](https://x.com/0xjayeshyadav/status/2065105243067883681) - Traces the vault standard from ERC-4626 through 7540, 7575, and 6909 to BoringVault and the curator era, ending in a rubric for what a complete vault needs. (intermediate)
+- [Tranching in DeFi](https://www.sumcap.xyz/blog/tranching-in-defi) - A survey of onchain tranching that separates tranching-as-a-product from tranching-as-a-service and maps the current senior and junior wave. (intermediate)
+- [An Overview of Senior-Junior Tranches in DeFi](https://serenityresearch.substack.com/p/serenity-premium-an-overview-of-senior) - A running research series tracking current tranching protocols mechanism by mechanism, including how thin junior liquidity forces the split ratio. (intermediate)
+- [Who Eats the Loss](https://medium.com/@Mezzanine_Fi/who-eats-the-loss-why-defi-yield-needs-structured-protection-2ebdbd23ddd1) - Argues that DeFi yield needs structured loss protection and walks through why senior and junior tranching is the mechanism, from a protocol building it. (beginner)
+- [DeFi Risk Transfer: Towards A Fully Decentralized Insurance Protocol](https://arxiv.org/abs/2212.10308) - An early formalization showing that DeFi insurance and DeFi tranching are the same mechanism seen from two sides, where the junior tranche is the insurance. (advanced)
 
 ## Videos, Talks, and Courses
 
