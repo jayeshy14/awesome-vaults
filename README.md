@@ -260,6 +260,7 @@ Yield-bearing stablecoins and synthetic dollars implemented as vaults.
 - [Ethena StakedUSDe.sol](https://github.com/ethena-labs/bbp-public-assets/blob/main/contracts/contracts/StakedUSDe.sol) - Source for sUSDe, an ERC-4626 staking vault that distributes protocol yield to USDe stakers with a vesting mechanism and a cooldown-gated withdrawal path. (advanced)
 - [Origin ARM (Automated Redemption Manager)](https://github.com/OriginProtocol/arm-oeth) - Source for Origin's ARM, a vault that provides instant redemption liquidity for a liquid staking token by holding a buffer and arbitraging the redemption queue. (advanced)
 - [Resolv: Staking stUSR and wstUSR](https://docs.resolv.xyz/litepaper/using-resolv/usr/stake) - Documents how the USR synthetic dollar is staked into the yield-bearing stUSR and its wrapped ERC-4626 form wstUSR, and how insurance-pool yield is distributed. (intermediate)
+- [Aave Stable Vault](https://github.com/aave-dao/stable-vault) - Source for a cross-chain fixed-rate savings vault where deposits into per-asset SubVaults earn a fixed per-second rate, funds are deployed into yield strategies such as Aave lending across chains, and a two-step request-and-execute withdrawal returns principal ahead of accrued interest when yield falls short. (advanced)
 
 ## Liquidity Management Vaults
 
