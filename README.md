@@ -236,6 +236,8 @@ Vaults that split risk and return into distinct layers: principal and yield, or 
 - [Chaos Labs: Building Risk Infrastructure for Boros](https://chaoslabs.xyz/posts/defi-rate-swaps-building-risk-infrastructure-for-boros) - Chaos Labs' methodology for margining onchain funding-rate swaps, covering a maintenance margin formula driven by rate volatility and time to maturity, TWAP bands and deviation caps against oracle manipulation, and auto-deleveraging calibrated by Monte Carlo simulation. (advanced)
 - [Resolv Docs: RLP](https://docs.resolv.xyz/litepaper/overview/rlp) - Documents RLP, the junior tranche of the Resolv stablecoin system, which holds the collateral in excess of USR's backing and absorbs market and counterparty losses first in exchange for a larger share of strategy yield. (intermediate)
 - [infiniFi Documentation](https://docs.infinifi.xyz/) - Docs for infiniFi's fractional-reserve design where USDC deposits mint iUSD that can be staked into liquid siUSD or locked into maturity-dated liUSD tranches, with losses allocated down a waterfall from locked to liquid holders. (intermediate)
+- [HostDeFi](https://hostdefi.com) - Free token-safety scanner: A+–F grades from on-chain checks (mint/freeze authority, liquidity depth, holder concentration, contract flags) across Solana and 7 EVM chains.
+
 - [Twyne Documentation](https://twyne.gitbook.io/twyne) - Docs for Twyne, a credit delegation layer built on Euler's EVC and EVK stack where lenders delegate unused borrowing capacity to leverage-seeking borrowers for a fee, creating layered risk positions with a deterministic loss order on top of existing lending markets. (intermediate)
 
 ## Structured Credit Foundations (TradFi)
